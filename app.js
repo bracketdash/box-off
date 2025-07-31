@@ -1,3 +1,5 @@
+let moveDelay = 300;
+
 function getMoves(board) {
   const moves = [];
   const rows = board.length;
@@ -51,27 +53,52 @@ function init() {
         .map(() => colors[Math.floor(Math.random() * colors.length)])
     );
   loop(board, { board, score: 0 }, []);
+  document
+    .querySelector(".speed select")
+    .addEventListener("change", (event) => {
+      moveDelay = event.target.value;
+    });
 }
 
 function loop(board, best, history) {
   updateDOM(board);
   const empties = board.flat().filter((cell) => cell === "e").length;
   if (empties === 64) {
-    console.log("I won!");
+    document.querySelector(".so-far").innerHTML = "WINNING!";
     return;
   }
-  if (best.score < empties) {
+  if (empties > best.score) {
     best = { board, score: empties };
+    document.querySelector(".so-far").innerHTML = empties;
   }
-  const moves = getMoves(board);
+  let newBoard = board.map((row) => row.slice());
+  let moves = getMoves(board);
+  let i = 0;
   if (!moves.length) {
-    // TODO
-    return;
+    while (history.length) {
+      const prev = history.pop();
+      if (prev.i + 1 < prev.moves.length) {
+        i = prev.i + 1;
+        board = prev.board.map((row) => row.slice());
+        moves = prev.moves;
+        history.push({ board, moves, i });
+        newBoard = board.map((row) => row.slice());
+        break;
+      }
+    }
+    if (!moves.length || !moves[i]) {
+      updateDOM(best.board);
+      console.log("All options exhausted. Best scoring board shown.");
+      return;
+    }
+  } else {
+    history.push({ board, moves, i });
   }
-  history.push({ board, moves, i: 0 });
-  // TODO: remove the two pegs from the board (turn them to "e")
-  // const newBoard = TODO (remove the two pegs in moves[i])
-  setTimeout();
+  newBoard[moves[i][0][0]][moves[i][0][1]] = "e";
+  newBoard[moves[i][1][0]][moves[i][1][1]] = "e";
+  setTimeout(() => {
+    loop(newBoard, best, history);
+  }, moveDelay);
 }
 
 function updateDOM(state) {

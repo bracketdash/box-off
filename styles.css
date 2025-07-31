@@ -73,3 +73,18 @@ body {
 .cell.y {
   background: #f1c40f;
 }
+
+.best-score {
+  margin: 30px auto;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #9ab;
+}
+
+.speed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
