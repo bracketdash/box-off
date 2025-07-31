@@ -1,5 +1,5 @@
-function getValidMoves(board) {
-  const validMoves = [];
+function getMoves(board) {
+  const moves = [];
   const rows = board.length;
   const cols = board[0].length;
   for (let r1 = 0; r1 < rows; r1++) {
@@ -29,7 +29,7 @@ function getValidMoves(board) {
             }
           }
           if (!blocked) {
-            validMoves.push([
+            moves.push([
               [r1, c1],
               [r2, c2],
             ]);
@@ -38,20 +38,40 @@ function getValidMoves(board) {
       }
     }
   }
-  return validMoves;
+  return moves;
 }
 
 function init() {
   const colors = ["r", "g", "b", "y"];
-  const state = new Array(8)
+  const board = new Array(8)
     .fill(null)
     .map(() =>
       new Array(8)
         .fill(null)
         .map(() => colors[Math.floor(Math.random() * colors.length)])
     );
-  updateDOM(state);
-  console.log(getValidMoves(state));
+  loop(board, { board, score: 0 }, []);
+}
+
+function loop(board, best, history) {
+  updateDOM(board);
+  const empties = board.flat().filter((cell) => cell === "e").length;
+  if (empties === 64) {
+    console.log("I won!");
+    return;
+  }
+  if (best.score < empties) {
+    best = { board, score: empties };
+  }
+  const moves = getMoves(board);
+  if (!moves.length) {
+    // TODO
+    return;
+  }
+  history.push({ board, moves, i: 0 });
+  // TODO: remove the two pegs from the board (turn them to "e")
+  // const newBoard = TODO (remove the two pegs in moves[i])
+  setTimeout();
 }
 
 function updateDOM(state) {
